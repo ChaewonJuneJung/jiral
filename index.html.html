@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>30분 땡땡이를 위한 지랄</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #fff8ef;
+      color: #2d3748;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .app {
+      min-height: 100vh;
+      position: relative;
+      padding: 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shape {
+      position: absolute;
+      opacity: 0.8;
+      animation: float 6s ease-in-out infinite;
+    }
+    .s1 { top: 30px; left: 10px; width: 95px; height: 95px; background: #fbcfe8; border-radius: 50%; }
+    .s2 { top: 80px; right: 18px; width: 88px; height: 88px; background: #fde68a; border-radius: 28px; transform: rotate(12deg); animation-delay: .5s; }
+    .s3 { top: 260px; left: -18px; width: 110px; height: 110px; background: #bae6fd; border-radius: 50%; animation-delay: 1s; }
+    .s4 { bottom: 120px; right: -10px; width: 120px; height: 120px; background: #d9f99d; border-radius: 34px; transform: rotate(-10deg); animation-delay: 1.5s; }
+    .s5 { bottom: 50px; left: 28px; width: 70px; height: 70px; background: #ddd6fe; border-radius: 50%; animation-delay: 2s; }
+    .s6 { top: 40%; right: 52px; width: 52px; height: 52px; background: #fecdd3; border-radius: 50%; animation-delay: 2.5s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .screen {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      z-index: 2;
+      display: none;
+      text-align: center;
+    }
+    .screen.active { display: block; }
+    .character-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .cat, .dog {
+      position: relative;
+      width: 220px;
+      height: 220px;
+    }
+    .cat .ear-left, .cat .ear-right,
+    .cat .face,
+    .dog .ear-left, .dog .ear-right,
+    .dog .face,
+    .sign, .card {
+      position: absolute;
+      border: 4px solid #334155;
+    }
+    .cat .ear-left {
+      top: 10px; left: 35px; width: 48px; height: 48px; background: #fed7aa;
+      border-radius: 28px 8px 8px 8px; transform: rotate(-28deg);
+    }
+    .cat .ear-right {
+      top: 10px; right: 35px; width: 48px; height: 48px; background: #fed7aa;
+      border-radius: 8px 28px 8px 8px; transform: rotate(28deg);
+    }
+    .cat .face {
+      top: 32px; left: 50%; transform: translateX(-50%);
+      width: 160px; height: 145px; background: #ffedd5; border-radius: 48px;
+      box-shadow: 0 14px 24px rgba(0,0,0,.08);
+    }
+    .eye, .nose, .mouth, .whisker { position: absolute; }
+    .cat .eye.left { top: 55px; left: 38px; width: 10px; height: 16px; background: #1e293b; border-radius: 999px; }
+    .cat .eye.right { top: 55px; right: 38px; width: 10px; height: 16px; background: #1e293b; border-radius: 999px; }
+    .cat .nose { top: 76px; left: 50%; transform: translateX(-50%); width: 22px; height: 16px; background: #f9a8d4; border: 3px solid #334155; border-radius: 999px; }
+    .cat .mouth { top: 98px; left: 50%; transform: translateX(-50%); width: 36px; height: 18px; border-bottom: 4px solid #334155; border-radius: 0 0 24px 24px; }
+    .cat .whisker.w1 { top: 80px; left: 12px; width: 44px; height: 2px; background: #334155; transform: rotate(6deg); }
+    .cat .whisker.w2 { top: 90px; left: 12px; width: 44px; height: 2px; background: #334155; transform: rotate(-6deg); }
+    .cat .whisker.w3 { top: 80px; right: 12px; width: 44px; height: 2px; background: #334155; transform: rotate(-6deg); }
+    .cat .whisker.w4 { top: 90px; right: 12px; width: 44px; height: 2px; background: #334155; transform: rotate(6deg); }
+    .sign {
+      position: relative;
+      margin-top: -10px;
+      width: 290px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 16px 20px;
+      font-weight: 900;
+      font-size: 23px;
+      line-height: 1.35;
+      box-shadow: 0 16px 28px rgba(0,0,0,.10);
+      animation: wobble 2.4s ease-in-out infinite;
+    }
+    @keyframes wobble {
+      0%,100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+    .start-btn, .option-btn {
+      width: 100%;
+      border: 4px solid #334155;
+      border-radius: 999px;
+      background: #fde047;
+      color: #111827;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(0,0,0,.1);
+    }
+    .start-btn {
+      max-width: 220px;
+      padding: 16px 20px;
+      font-size: 22px;
+      margin-top: 8px;
+    }
+    .quiz-box {
+      background: rgba(255,255,255,.92);
+      border: 4px solid #334155;
+      border-radius: 30px;
+      box-shadow: 0 16px 30px rgba(0,0,0,.1);
+      padding: 22px 16px;
+      backdrop-filter: blur(6px);
+    }
+    .label { font-size: 13px; font-weight: 900; color: #64748b; letter-spacing: .08em; }
+    .question {
+      margin: 8px 0 18px;
+      font-size: 28px;
+      line-height: 1.35;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+    .options { display: grid; gap: 10px; }
+    .option-btn {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 15px 14px;
+      text-align: left;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .feedback {
+      min-height: 28px;
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #e11d48;
+    }
+    .dog .ear-left {
+      top: 30px; left: 12px; width: 60px; height: 82px; background: #fde68a; border-radius: 36px; transform: rotate(-18deg);
+    }
+    .dog .ear-right {
+      top: 30px; right: 12px; width: 60px; height: 82px; background: #fde68a; border-radius: 36px; transform: rotate(18deg);
+    }
+    .dog .face {
+      top: 36px; left: 50%; transform: translateX(-50%);
+      width: 160px; height: 145px; background: #fef3c7; border-radius: 48px; box-shadow: 0 14px 24px rgba(0,0,0,.08);
+    }
+    .dog .eye.left { top: 56px; left: 42px; width: 14px; height: 14px; background: #1e293b; border-radius: 50%; }
+    .dog .eye.right { top: 56px; right: 42px; width: 14px; height: 14px; background: #1e293b; border-radius: 50%; }
+    .dog .nose-area {
+      position: absolute; top: 78px; left: 50%; transform: translateX(-50%);
+      width: 58px; height: 44px; background: #fdba74; border: 4px solid #334155; border-radius: 24px;
+    }
+    .dog .nose {
+      top: 10px; left: 50%; transform: translateX(-50%); width: 18px; height: 12px; background: #1e293b; border-radius: 999px;
+    }
+    .dog .mouth { top: 118px; left: 50%; transform: translateX(-50%); width: 34px; height: 18px; border-bottom: 4px solid #334155; border-radius: 0 0 24px 24px; }
+    .card {
+      position: relative;
+      margin-top: -6px;
+      width: 305px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 16px 18px;
+      font-weight: 900;
+      font-size: 18px;
+      line-height: 1.55;
+      box-shadow: 0 16px 28px rgba(0,0,0,.10);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(.97); }
+      50% { transform: scale(1); }
+    }
+    @media (max-width: 380px) {
+      .question { font-size: 24px; }
+      .sign { width: 100%; font-size: 20px; }
+      .card { width: 100%; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+    <div class="shape s4"></div>
+    <div class="shape s5"></div>
+    <div class="shape s6"></div>
+
+    <section class="screen active" id="home-screen">
+      <div class="character-wrap">
+        <div class="cat">
+          <div class="ear-left"></div>
+          <div class="ear-right"></div>
+          <div class="face">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="nose"></div>
+            <div class="mouth"></div>
+            <div class="whisker w1"></div>
+            <div class="whisker w2"></div>
+            <div class="whisker w3"></div>
+            <div class="whisker w4"></div>
+          </div>
+        </div>
+        <div class="sign">30분 땡땡이를 위한 지랄</div>
+        <button class="start-btn" onclick="goToQuiz(0)">시작하기</button>
+      </div>
+    </section>
+
+    <section class="screen" id="quiz-screen">
+      <div class="quiz-box">
+        <div class="label">QUIZ TIME</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="end-screen">
+      <div class="character-wrap">
+        <div class="dog">
+          <div class="ear-left"></div>
+          <div class="ear-right"></div>
+          <div class="face">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="nose-area"><div class="nose"></div></div>
+            <div class="mouth"></div>
+          </div>
+        </div>
+        <div class="card">이거 프롬포트 입력하는데만 11분 걸렸음 그럼 이만</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: '정채원이 오늘 마신 음료는?',
+        options: ['1번 아이스티', '2번 아메리카노', '3번 아샷추', '4번 바닐라라떼'],
+        answer: 1,
+        wrongMessage: '땡! 다시 맞춰보세용!'
+      },
+      {
+        question: '다음 중 정채원이 해보지 않은 알바는?',
+        options: ['1번 쿠팡 물류', '2번 카페', '3번 국밥집', '4번 편의점', '5번 찜질방', '6번 전시회'],
+        answer: 3,
+        wrongMessage: 'ㅋㅋ 의외로 다해봤죠?'
+      },
+      {
+        question: '내가 싫어하는 계절은?',
+        options: ['1번 봄', '2번 여름', '3번 가을', '4번 겨울'],
+        answer: 3,
+        wrongMessage: '이거는 좋아함..'
+      }
+    ];
+
+    let currentIndex = 0;
+
+    const homeScreen = document.getElementById('home-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const endScreen = document.getElementById('end-screen');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+
+    function showScreen(screen) {
+      [homeScreen, quizScreen, endScreen].forEach(el => el.classList.remove('active'));
+      screen.classList.add('active');
+    }
+
+    function goToQuiz(index) {
+      currentIndex = index;
+      renderQuiz();
+      showScreen(quizScreen);
+    }
+
+    function renderQuiz() {
+      const quiz = quizData[currentIndex];
+      questionEl.textContent = quiz.question;
+      feedbackEl.textContent = '';
+      optionsEl.innerHTML = '';
+
+      quiz.options.forEach((option, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option;
+        btn.onclick = () => handleAnswer(idx);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx) {
+      const quiz = quizData[currentIndex];
+      if (selectedIdx === quiz.answer) {
+        feedbackEl.textContent = '';
+        if (currentIndex < quizData.length - 1) {
+          currentIndex += 1;
+          setTimeout(renderQuiz, 180);
+        } else {
+          setTimeout(() => showScreen(endScreen), 180);
+        }
+      } else {
+        feedbackEl.textContent = quiz.wrongMessage;
+      }
+    }
+  </script>
+</body>
+</html>
